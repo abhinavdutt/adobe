@@ -9,24 +9,18 @@
 #                                                               #
 #################################################################
 
-# Executable name and location
-BINDIR = output
-TARGET = threadpool
-
-# Compiler
-CXX = g++
-
-CXXFLAGS = -g -O2 -Wfatal-errors -Wshadow -Wall -std=c++11 -lstdc++ -L/usr/local/lib -I/usr/include/boost
-LDFLAGS = -lboost_system -lboost_filesystem -lboost_program_options -lboost_thread 
-
-OBJECTDIR = obj
-
-all: $(TARGET)
-
+output: ThreadPool.o main.o
+	g++ ThreadPool.o main.o -o output
+	
+main.o: main.cpp
+	g++ -c main.cpp
+	
+ThreadPool.o: ThreadPool.cpp ThreadPool.hpp
+	g++ -c ThreadPool.cpp
+	
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -rf *.o output
 
-OBJECTS = $(OBJECTDIR)/ThreadPool.o
 
-$(TARGET): $(OBJECTS) 
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LDFLAGS) -o $(BINDIR)/$(TARGET)
+
+
