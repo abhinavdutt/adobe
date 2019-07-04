@@ -40,33 +40,40 @@ MemoryPool<ELEM_TYPE> :: ~MemoryPool()
 	}
 }
 
-template <class ELEM_TYPE>
-ELEM_TYPE *MemoryPool<ELEM_TYPE>::alloc(size_t size)
-{
-	if (!size)
-	{
-		return nullptr;
-	}
 
-	ELEM_TYPE *ptr = nullptr;
-	std::unique_lock<std::mutex> pool_lock(_pool_mu);
-	auto& q = _slot_map[size];
-	if (q.empty())
-	{
-		ptr = _alloc_fun(size);
-		if (ptr)
-		{
-			_ptr_map[ptr] = size;
-			_used_mem += size;
-		}
-	}
-	else
-	{
-		ptr = q.front();
-		q.pop_front();
-	}
-	return ptr;
+/*When allocating memory , the memory pool requires the _slot_map hash table to check whether there is an unoccupied memory for the specified size
+if have , pop the memory address from the queue, otherwise, trigger the genuine allocating memory operation, and add the memory address and size into the _ptr_map hash table.*/
+
+template <class ELEM_TYPE>
+ELEM_TYPE *MemoryPool<ELEM_TYPE>::alloc(size_t elem_num)
+{
+        auto size = elem_num * sizeof(ELEM_TYPE);
+        if (!size)
+        {
+                return nullptr;
+        }
+
+        ELEM_TYPE *ptr = nullptr;
+        std::unique_lock<std::mutex> pool_lock(_pool_mu);
+        auto& q = _slot_map[size];
+        if (q.empty())
+        {
+                ptr = _alloc_fun(size);
+                if (ptr)
+                {
+                        _ptr_map[ptr] = size;
+                        _used_mem += size;
+                }
+        }
+        else
+        {
+                ptr = q.front();
+                q.pop_front();
+        }
+        return ptr;
 }
+
+/*When freeing memory, the memory pool queries the _ptr_map  hash table to get the size of current memory address, then access the _slot_map hash table to push the memory address back to queue */
 
 template <class ELEM_TYPE>
 void MemoryPool<ELEM_TYPE>::free(ELEM_TYPE* ptr)
