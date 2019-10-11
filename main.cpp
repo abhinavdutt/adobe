@@ -17,8 +17,7 @@
 
 using namespace std;
 #include "ThreadPool.cpp"
-
-int main()
+main()
 {
 
 	//Integer data type
@@ -38,8 +37,4 @@ int main()
 	auto p3 = obj3.alloc(100.234567);
 	cout<<p3<<endl;
 	obj3.free(p3);
-
-
-
-	return 0;
 }
