@@ -27,4 +27,5 @@ BUILD INSTRUCTIONS
 Run "make" , the executable 'output' will be created
 
 ./output.exe
+Adobe participates in the hacktoberfest
 
